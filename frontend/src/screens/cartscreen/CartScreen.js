@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Row,
@@ -14,6 +14,11 @@ import { addToCart } from "../../actions/cartActions";
 import "./CartScreen.css";
 import { Link } from "react-router-dom";
 
+
+const mapState = ({ cart }) => ({
+  cartItems: cart.cartItems
+})
+
 const CartScreen = ({ match, location, history }) => {
   const productId = match.params.id;
 
@@ -21,9 +26,9 @@ const CartScreen = ({ match, location, history }) => {
 
   const dispatch = useDispatch();
 
-  const cart = useDispatch((state) => state.cart);
+  const { cartItems } = useSelector(mapState)
 
-  const cartItems = cart;
+  const [cart, setCart] = useState([])
 
   useEffect(() => {
     if (productId) {
@@ -31,12 +36,19 @@ const CartScreen = ({ match, location, history }) => {
     }
   }, [dispatch, productId, qty]);
 
+  useEffect(() => {
+    if(Array.isArray(cartItems) && cartItems.length !== 0) {
+      console.log(cartItems)
+      setCart(cartItems)
+    }
+  }, [cartItems])
+
   return (
     <Row>
       <Col md={8}>
         <h1>Shopping Cart</h1>
 
-        {cartItems.length === 0 ? (
+        {cart.length === 0 ? (
           <Message>
             Your cart is empty <Link to="/">Go Back</Link>
           </Message>
